@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/load"
+        android:title="Carregar"
+        android:icon="@drawable/baseline_more_vert_24"
+        app:showAsAction="never"/>
+    <item android:id="@+id/list"
+        android:title="Listar"
+        android:icon="@drawable/baseline_more_vert_24"
+        app:showAsAction="never"/>
+    <item android:id="@+id/save"
+        android:title="Salvar"
+        android:icon="@drawable/baseline_check_24"
+        app:showAsAction="always" />
+    <item android:id="@+id/delete"
+        android:title="deletar"
+        android:icon="@drawable/baseline_delete_24"
+        app:showAsAction="always"/>
+
+</menu>

@@ -1,14 +1,21 @@
 package com.example.cadastrarcontatos;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -54,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         edtEmail.setText("");
     }
 
-    public void onSalvarClick(View v) {
+    public void onSalvarClick() {
         String nome = edtNome.getText().toString();
         String email = edtEmail.getText().toString();
         String codigo = edtCodigo.getText().toString();
@@ -73,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
                 database.insert(NOME_TABELA, null, values);
             }
             limparCampos();
+            mostrarSucessoDialog();
         }
     }
 
@@ -90,18 +98,29 @@ public class MainActivity extends AppCompatActivity {
         c.close();
     }
 
-    public void onExcluirClick(View v) {
-        String codigo = edtCodigo.getText().toString().trim();
-        if (codigo.isEmpty()) {
-            edtCodigo.requestFocus();
-            Toast.makeText(this, "codigo obrigatorio", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        database.delete(NOME_TABELA, CAMPO_ID + " = " + codigo, null);
-        limparCampos();
+    public void onExcluirClick() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Atencao")
+                .setMessage("Esse registro sera excluido definitivamente")
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String codigo = edtCodigo.getText().toString().trim();
+                        if (codigo.isEmpty()) {
+                            edtCodigo.requestFocus();
+                            return;
+                        }
+                        database.delete(NOME_TABELA, CAMPO_ID + " = " + codigo, null);
+                        limparCampos();
+                    }
+                })
+                .setNegativeButton("Cancelar", null);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
     }
 
-    public void onCarregar(View v) {
+    public void onCarregar() {
         String codigo = edtCodigo.getText().toString().trim();
         if (codigo.isEmpty()) {
             edtCodigo.requestFocus();
@@ -112,11 +131,51 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void onListarClick(View v) {
+    public void onListarClick() {
         Cursor cursor = obterContatos();
 
         while (cursor.moveToNext()) {
             Log.d("listar", "id: " + cursor.getString(0) + " nome: " + cursor.getString(1) + " email: " + cursor.getString(2));
         }
+
+        Toast.makeText(this, "listado no terminal", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_principal, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.load:
+                onCarregar();
+                return true;
+
+            case R.id.list:
+                onListarClick();
+                return true;
+
+            case R.id.save:
+                onSalvarClick();
+                return true;
+
+            case R.id.delete:
+                onExcluirClick();
+                return true;
+        }
+        return true;
+    }
+
+    private void mostrarSucessoDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Sucesso")
+                .setMessage("O registro foi gravado com sucesso!")
+                .setPositiveButton("Ok", null);
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }
